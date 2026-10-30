@@ -51,3 +51,22 @@ async function enterWorkspace(user){currentUser=user;const {data:profile,error:p
 async function bootstrapSupabase(){if(!window.supabase){showLogin('Supabase library failed to load. Check your internet connection and reload.');return}const {data,error}=await supabaseClient.auth.getSession();if(error){showLogin(error.message);return}if(data.session)await enterWorkspace(data.session.user);else showLogin()}
 bootstrapSupabase();
 </script></body></html>
+$('#loginForm').onsubmit=async e=>{
+  e.preventDefault();
+  $('#loginButton').disabled=true;
+  $('#loginButton').textContent='Signing in…';
+
+  const {data,error}=await supabaseClient.auth.signInWithPassword({
+    email:$('#loginEmail').value.trim(),
+    password:$('#loginPassword').value
+  });
+
+  if(error){
+    $('#loginButton').disabled=false;
+    $('#loginButton').textContent='Sign in';
+    alert(error.message);
+    return;
+  }
+
+  await enterWorkspace(data.user);
+};
